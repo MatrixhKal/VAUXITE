@@ -8,7 +8,7 @@ on:
         type: choice
         options:
           - Ayanami-rc2
-          - bengal-kona
+          - Ayanami-rc2-kona-2
         default: Ayanami-rc2
 permissions:
   contents: write
@@ -19,8 +19,8 @@ jobs:
       - name: Resolve branch and zip name
         id: vars
         run: |
-          if [ "${{ inputs.branch }}" = "bengal-kona" ]; then
-            echo "kernel_branch=bengal-kona" >> "$GITHUB_OUTPUT"
+          if [ "${{ inputs.branch }}" = "Ayanami-rc2-kona-2" ]; then
+            echo "kernel_branch=Ayanami-rc2-kona-2" >> "$GITHUB_OUTPUT"
             echo "zip_suffix=Kona-rhode" >> "$GITHUB_OUTPUT"
           else
             echo "kernel_branch=Ayanami-rc2" >> "$GITHUB_OUTPUT"
@@ -56,7 +56,7 @@ jobs:
         run: |
           mkdir -p out
 
-          sh scripts/kconfig/merge_config.sh -m -O out/ arch/arm64/configs/vendor/bengal-perf_defconfig arch/arm64/configs/vendor/ext_config/moto-bengal.config arch/arm64/configs/vendor/ext_config/rhode-default.config
+          sh scripts/kconfig/merge_config.sh -m -O out/ arch/arm64/configs/vendor/bengal-perf_defconfig arch/arm64/configs/vendor/ext_config/moto-bengal.config arch/arm64/configs/vendor/ext_config/rhode-default.config arch/arm64/configs/vendor/ayanami.config
 
       - name: Build Kernel
         working-directory: kernel
