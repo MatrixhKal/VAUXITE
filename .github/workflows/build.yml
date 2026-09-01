@@ -9,7 +9,8 @@ on:
         options:
           - Ayanami-rc2
           - Ayanami-rc2-kona-2
-        default: Ayanami-rc2
+          - staging
+        default: staging
 permissions:
   contents: write
 jobs:
@@ -25,6 +26,9 @@ jobs:
           else
             echo "kernel_branch=Ayanami-rc2" >> "$GITHUB_OUTPUT"
             echo "zip_suffix=rhode" >> "$GITHUB_OUTPUT"
+          else
+            echo "kernel_branch=staging" >> "$GITHUB_OUTPUT"
+            echo "zip_suffix="staging-rhode" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Install required packages
@@ -39,14 +43,14 @@ jobs:
         run: |
           git clone -b ${{ steps.vars.outputs.kernel_branch }} https://github.com/MatrixhKa/android_kernel_motorola_sm6225 --depth=1 kernel
 
-      - name: Setup AOSP Clang
+      - name: Setup Neutron Clang
         run: |
           mkdir -p ~/clang && cd ~/clang     
           wget https://github.com/Neutron-Toolchains/clang-build-catalogue/releases/download/30072026/neutron-clang-30072026.tar.zst -O clang.tar.zst
           tar -xvf clang.tar.zst
           rm -f clang.tar.zst
 
-      - name: Setup KernelSU
+      - name: Setup ReSukiSU
         working-directory: kernel
         run: |
           curl -LSs "https://github.com/ReSukiSU/ReSukiSU/raw/refs/heads/main/kernel/setup.sh" | bash -s
