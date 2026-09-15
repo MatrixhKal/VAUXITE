@@ -43,7 +43,7 @@ jobs:
 
       - name: Checkout Kernel
         run: |
-          git clone -b "${{ steps.vars.outputs.kernel_branch }}" https://github.com/MatrixhKa/android_kernel_motorola_sm6225 --depth=1 kernel
+          git clone -b "${{ steps.vars.outputs.kernel_branch }}" https://gitlab.com/MatrixhKa/android_kernel_motorola_sm6225 --depth=1 kernel
 
       - name: Setup Neutron Clang
         run: |
