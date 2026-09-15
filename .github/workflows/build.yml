@@ -85,7 +85,7 @@ jobs:
       - name: Prepare AnyKernel3
         run: |
           mkdir -p output
-          git clone --depth=1 https://github.com/MatrixhKa/AnyKernel3.git AnyKernel3
+          git clone --depth=1 https://gitlab.com/MatrixhKa/AnyKernel3.git AnyKernel3
           cp kernel/out/arch/arm64/boot/Image.gz AnyKernel3/Image.gz
           cd AnyKernel3
           zip -r9 "../output/AnyKernel3-${{ steps.vars.outputs.zip_suffix }}-${{ github.run_number }}.zip" . \
