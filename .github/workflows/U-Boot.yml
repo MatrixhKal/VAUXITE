@@ -32,13 +32,12 @@ jobs:
             gcc-aarch64-linux-gnu \
             libgnutls28-dev \
             uuid-dev
-      
-      - name: Fetch official AOSP mkbootimg script
-        run: |
-          curl -sSL "https://android.googlesource.com/platform/system/tools/mkbootimg/+/refs/heads/main/mkbootimg.py?format=TEXT" | base64 --decode > /usr/local/bin/mkbootimg
-          chmod +x /usr/local/bin/mkbootimg
 
-      - name: Clone U-Boot repository
+      - name: Clone AOSP mkbootimg repository
+        run: |
+          git clone --depth 1 https://android.googlesource.com/platform/system/tools/mkbootimg $HOME/mkbootimg_tools
+
+      - name: Clone U-Boot
         run: |
           git clone --depth 1 -b sm6225 https://gitlab.com/sm6225-schizophrenics/rhode-mainline/u-boot-motorola-rhode.git u-boot
 
@@ -71,7 +70,7 @@ jobs:
 
           mkdir -p ../output
 
-          mkbootimg \
+          python3 $HOME/mkbootimg_tools/mkbootimg.py \
             --header_version 3 \
             --kernel ${UBOOT}.gz \
             --ramdisk ${INITFS_FILE} \
