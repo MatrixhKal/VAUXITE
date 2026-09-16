@@ -1,0 +1,72 @@
+name: Build U-Boot Motorola Rhode (SM6225)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      DEFCONFIG: qcom_defconfig
+      DEVICE_TREE: dts/upstream/src/arm64/qcom/sm6225-motorola-rhode.dtb
+      ARCH: arm64
+      CROSS_COMPILE: aarch64-linux-gnu-
+
+    steps:
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git \
+            build-essential \
+            bc \
+            bison \
+            flex \
+            libssl-dev \
+            libncurses-dev \
+            swig \
+            python3-dev \
+            python3-setuptools \
+            python3-pyelftools \
+            device-tree-compiler \
+            gcc-aarch64-linux-gnu
+
+      - name: Clone U-Boot
+        run: |
+          git clone --depth 1 -b sm6225 https://gitlab.com/sm6225-schizophrenics/rhode-mainline/u-boot-motorola-rhode.git u-boot
+
+      - name: Configure U-Boot (make defconfig)
+        run: |
+          cd u-boot
+          make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} ${{ env.DEFCONFIG }}
+
+      - name: Build U-Boot
+        run: |
+          cd u-boot
+          make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} DEVICE_TREE=${{ env.DEVICE_TREE }} -j$(nproc)
+
+      - name: Prepare release artifacts
+        run: |
+          mkdir -p output
+          cp u-boot/u-boot.bin output/u-boot.bin || true
+          cp u-boot/u-boot.img output/u-boot.img || true
+          cp u-boot/u-boot.dtb output/u-boot.dtb || true
+          cp u-boot/.config output/u-boot.config || true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: u-boot-rhode-${{ github.run_number }}
+          name: U-Boot Motorola Rhode - Build #${{ github.run_number }}
+          body: |
+            Automated U-Boot build for Motorola Rhode (SM6225).
+            - Branch: `sm6225`
+            - Device Tree: `sm6225-motorola-rhode.dts`
+          files: |
+            output/u-boot.bin
+            output/u-boot.img
+            output/u-boot.dtb
+            output/u-boot.config
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
