@@ -33,10 +33,10 @@ jobs:
             libgnutls28-dev \
             uuid-dev
       
-      - name: Install official mkbootimg tool
+      - name: Fetch official AOSP mkbootimg script
         run: |
-          pip3 install --upgrade pip
-          pip3 install mkbootimg
+          curl -sSL "https://android.googlesource.com/platform/system/tools/mkbootimg/+/refs/heads/main/mkbootimg.py?format=TEXT" | base64 --decode > /usr/local/bin/mkbootimg
+          chmod +x /usr/local/bin/mkbootimg
 
       - name: Clone U-Boot repository
         run: |
