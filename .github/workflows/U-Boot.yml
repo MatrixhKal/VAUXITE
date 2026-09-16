@@ -34,7 +34,7 @@ jobs:
       - name: Configure U-Boot
         run: |
           cd u-boot
-          make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=.output qcom_defconfig qcom-phone.config
+          make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=output qcom_defconfig qcom-phone.config
 
       - name: Build U-Boot
         run: |
