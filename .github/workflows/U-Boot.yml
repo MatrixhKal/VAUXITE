@@ -29,7 +29,9 @@ jobs:
             python3-setuptools \
             python3-pyelftools \
             device-tree-compiler \
-            gcc-aarch64-linux-gnu
+            gcc-aarch64-linux-gnu \
+            libgnutls28-dev \
+            uuid-dev
 
       - name: Clone U-Boot
         run: |
