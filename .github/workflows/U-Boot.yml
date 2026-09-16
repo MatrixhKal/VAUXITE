@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DEFCONFIG: qcom_defconfig
+      DEFCONFIG: qcom_defconfig qcom-phone.config
       DEVICE_TREE: qcom/sm6225-motorola-rhode
       ARCH: arm
       CROSS_COMPILE: aarch64-linux-gnu-
