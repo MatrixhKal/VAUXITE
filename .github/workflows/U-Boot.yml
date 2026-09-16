@@ -9,7 +9,6 @@ jobs:
 
     env:
       DEFCONFIG: qcom_defconfig
-      DEVICE_TREE: dts/upstream/src/arm64/qcom/sm6225-motorola-rhode.dtb
       ARCH: arm64
       CROSS_COMPILE: aarch64-linux-gnu-
 
@@ -45,7 +44,7 @@ jobs:
       - name: Build U-Boot
         run: |
           cd u-boot
-          make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} DEVICE_TREE=${{ env.DEVICE_TREE }} -j$(nproc)
+          make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} -j$(nproc)
 
       - name: Prepare release artifacts
         run: |
