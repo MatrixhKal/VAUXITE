@@ -12,6 +12,7 @@ jobs:
 
     env:
       DEFCONFIG: qcom_defconfig
+      DEVICE_TREE: qcom/sm6225-motorola-rhode
       ARCH: arm
       CROSS_COMPILE: aarch64-linux-gnu-
 
@@ -52,18 +53,18 @@ jobs:
       - name: Build U-Boot
         run: |
           cd u-boot
-          make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} -j$(nproc)
+          make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} DEVICE_TREE=${{ env.DEVICE_TREE }} -j$(nproc)
+          test -f u-boot-dtb.bin
 
       - name: Pack U-Boot into Boot Image
         run: |
           cd u-boot
-          
+
+          UBOOT="u-boot-dtb.bin"
+          DTB="arch/arm/dts/${{ env.DEVICE_TREE }}.dtb"
           INITFS_FILE="initramfs-empty.gz"
-          UBOOT="u-boot-nodtb.bin"
-          
-          if [ ! -f "${UBOOT}" ]; then
-            cp u-boot.bin ${UBOOT}
-          fi
+
+          test -f "${DTB}"
 
           gzip -c -9 ${UBOOT} > ${UBOOT}.gz
 
@@ -75,13 +76,16 @@ jobs:
 
           python3 $HOME/mkbootimg_tools/mkbootimg.py \
             --header_version 3 \
+            --pagesize 4096 \
             --kernel ${UBOOT}.gz \
             --ramdisk ${INITFS_FILE} \
+            --dtb ${DTB} \
             --os_version "15.0.0" \
             --os_patch_level "2025-10" \
             -o ../output/boot-uboot-sm6225.img
 
-          cp u-boot.bin ../output/u-boot.bin || true
+          cp u-boot-dtb.bin ../output/ || true
+          cp ${DTB} ../output/ || true
           cp .config ../output/u-boot.config || true
 
       - name: Create GitHub Release
