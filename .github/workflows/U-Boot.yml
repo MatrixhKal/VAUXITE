@@ -9,7 +9,7 @@ jobs:
 
     env:
       DEFCONFIG: qcom_defconfig
-      ARCH: arm64
+      ARCH: arm
       CROSS_COMPILE: aarch64-linux-gnu-
 
     steps:
