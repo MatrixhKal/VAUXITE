@@ -79,7 +79,6 @@ jobs:
             --pagesize 4096 \
             --kernel ${UBOOT}.gz \
             --ramdisk ${INITFS_FILE} \
-            --dtb ${DTB} \
             --os_version "15.0.0" \
             --os_patch_level "2025-10" \
             -o ../output/boot-uboot-sm6225.img
