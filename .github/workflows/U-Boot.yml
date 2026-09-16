@@ -36,7 +36,7 @@ jobs:
         run: |
           git clone --depth 1 -b sm6225 https://gitlab.com/sm6225-schizophrenics/rhode-mainline/u-boot-motorola-rhode.git u-boot
 
-      - name: Configure U-Boot (make defconfig)
+      - name: Configure U-Boot
         run: |
           cd u-boot
           make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} ${{ env.DEFCONFIG }}
