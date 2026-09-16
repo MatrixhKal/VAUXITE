@@ -30,17 +30,17 @@ jobs:
             python3-pyelftools \
             device-tree-compiler \
             gcc-aarch64-linux-gnu \
+            mkbootimg \
             libgnutls28-dev \
             uuid-dev
 
-      - name: Clone U-Boot
+      - name: Clone U-Boot repository
         run: |
           git clone --depth 1 -b sm6225 https://gitlab.com/sm6225-schizophrenics/rhode-mainline/u-boot-motorola-rhode.git u-boot
 
       - name: Configure U-Boot
         run: |
           cd u-boot
-          mkdir -p arch/arm64/include/asm
           make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} ${{ env.DEFCONFIG }}
 
       - name: Build U-Boot
@@ -48,13 +48,35 @@ jobs:
           cd u-boot
           make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} -j$(nproc)
 
-      - name: Prepare release artifacts
+      - name: Pack U-Boot into Boot Image
         run: |
-          mkdir -p output
-          cp u-boot/u-boot.bin output/u-boot.bin || true
-          cp u-boot/u-boot.img output/u-boot.img || true
-          cp u-boot/u-boot.dtb output/u-boot.dtb || true
-          cp u-boot/.config output/u-boot.config || true
+          cd u-boot
+          
+          INITFS_FILE="initramfs-empty.gz"
+          UBOOT="u-boot-nodtb.bin"
+          
+          if [ ! -f "${UBOOT}" ]; then
+            cp u-boot.bin ${UBOOT}
+          fi
+
+          gzip -c -9 ${UBOOT} > ${UBOOT}.gz
+
+          echo 1 > 1
+          gzip -c -9 1 > ${INITFS_FILE}
+          rm -f 1
+
+          mkdir -p ../output
+
+          mkbootimg \
+            --header_version 3 \
+            --kernel ${UBOOT}.gz \
+            --ramdisk ${INITFS_FILE} \
+            --os_version "15.0.0" \
+            --os_patch_level "2025-10" \
+            -o ../output/boot-uboot-sm6225.img
+
+          cp u-boot.bin ../output/u-boot.bin || true
+          cp .config ../output/u-boot.config || true
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -62,13 +84,10 @@ jobs:
           tag_name: u-boot-rhode-${{ github.run_number }}
           name: U-Boot Motorola Rhode - Build #${{ github.run_number }}
           body: |
-            Automated U-Boot build for Motorola Rhode (SM6225).
+            Automated U-Boot build for Motorola Rhode / Qualcomm SM6225.
             - Branch: `sm6225`
-            - Device Tree: `sm6225-motorola-rhode.dts`
+            - Target: `boot-uboot-sm6225.img`
           files: |
-            output/u-boot.bin
-            output/u-boot.img
-            output/u-boot.dtb
-            output/u-boot.config
+            output/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
