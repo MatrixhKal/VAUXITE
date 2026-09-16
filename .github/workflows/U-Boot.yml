@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DEFCONFIG: qcom_defconfig qcom-phone.config
+      DEFCONFIG: qcom_defconfig
       DEVICE_TREE: qcom/sm6225-motorola-rhode
       ARCH: arm
       CROSS_COMPILE: aarch64-linux-gnu-
@@ -48,7 +48,7 @@ jobs:
       - name: Configure U-Boot
         run: |
           cd u-boot
-          make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} ${{ env.DEFCONFIG }}
+          make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} ${{ env.DEFCONFIG }} qcom-phone.config
 
       - name: Build U-Boot
         run: |
@@ -101,3 +101,4 @@ jobs:
             output/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
