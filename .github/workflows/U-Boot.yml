@@ -39,6 +39,7 @@ jobs:
       - name: Configure U-Boot
         run: |
           cd u-boot
+          mkdir -p arch/arm64/include/asm
           make ARCH=${{ env.ARCH }} CROSS_COMPILE=${{ env.CROSS_COMPILE }} ${{ env.DEFCONFIG }}
 
       - name: Build U-Boot
