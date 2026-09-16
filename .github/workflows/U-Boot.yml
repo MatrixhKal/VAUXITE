@@ -3,6 +3,9 @@ name: Build U-Boot Motorola Rhode (SM6225)
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
