@@ -27,19 +27,27 @@ jobs:
           CFLAGS=-Wstringop-overflow=0 make mkbootimg
           cd ..
 
+      - name: Clone U-Boot
+        run: |
+          git clone --depth 1 -b sm6225 https://gitlab.com/sm6225-schizophrenics/rhode-mainline/u-boot-motorola-rhode.git u-boot
+
       - name: Configure U-Boot
         run: |
-          make CROSS_COMPILE=aarch64-linux-gnu- O=.output qcom_defconfig qcom-phone.config
+          cd u-boot
+          make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=.output qcom_defconfig qcom-phone.config
 
       - name: Build U-Boot
         run: |
-          make CROSS_COMPILE=aarch64-linux-gnu- O=.output -j$(nproc) CONFIG_DEFAULT_DEVICE_TREE=qcom/sm6225-motorola-rhode
+          cd u-boot
+          mkdir -p output
+          make CROSS_COMPILE=aarch64-linux-gnu- O=output -j$(nproc) CONFIG_DEFAULT_DEVICE_TREE=qcom/sm6225-motorola-rhode
 
       - name: Assemble Android boot.img
         run: |
-          gzip .output/u-boot-nodtb.bin -c > .output/u-boot-nodtb.bin.gz
-          cat .output/u-boot-nodtb.bin.gz .output/dts/upstream/src/arm64/qcom/sm6225-motorola-rhode.dtb > .output/uboot-dtb
-          ./mkbootimg/mkbootimg --base '0x0' --kernel_offset '0x00008000' --pagesize '4096' --kernel .output/uboot-dtb -o .output/u-boot.img
+          cd u-boot
+          gzip output/u-boot-nodtb.bin -c > .output/u-boot-nodtb.bin.gz
+          cat output/u-boot-nodtb.bin.gz .output/dts/upstream/src/arm64/qcom/sm6225-motorola-rhode.dtb > output/uboot-dtb
+          ../mkbootimg/mkbootimg --base '0x0' --kernel_offset '0x00008000' --pagesize '4096' --kernel output/uboot-dtb -o output/u-boot.img
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -49,8 +57,8 @@ jobs:
           body: |
             Automated U-Boot build for Motorola Rhode / Qualcomm SM6225.
             - Branch: `sm6225`
-            - Target: `boot-uboot-sm6225.img`
+            - Target: `u-boot.img`
           files: |
-            .output/u-boot.img
+            u-boot/output/u-boot.img
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
