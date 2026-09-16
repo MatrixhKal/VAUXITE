@@ -30,9 +30,13 @@ jobs:
             python3-pyelftools \
             device-tree-compiler \
             gcc-aarch64-linux-gnu \
-            mkbootimg \
             libgnutls28-dev \
             uuid-dev
+      
+      - name: Install official mkbootimg tool
+        run: |
+          pip3 install --upgrade pip
+          pip3 install mkbootimg
 
       - name: Clone U-Boot repository
         run: |
