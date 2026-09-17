@@ -1,0 +1,66 @@
+name: Build U-Boot Motorola Rhode (SM6225)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y --no-install-recommends gcc-aarch64-linux-gnu libgnutls28-dev
+
+      # mkbootimg in Ubuntu repos is broken, so use the forked C variant
+      - name: Build mkbootimg
+        run: |
+          git clone https://github.com/osm0sis/mkbootimg
+          cd mkbootimg
+          CFLAGS=-Wstringop-overflow=0 make mkbootimg
+          cd ..
+
+      - name: Clone U-Boot
+        run: |
+          git clone --depth 1 -b sm6225 https://gitlab.com/sm6225-schizophrenics/rhode-mainline/u-boot-motorola-rhode.git u-boot
+
+      - name: Configure U-Boot
+        run: |
+          cd u-boot
+          make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=output qcom_defconfig qcom-phone.config
+          ./scripts/config --file output/.config --enable VIDEO_SIMPLE
+          make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=output olddefconfig
+
+      - name: Build U-Boot
+        run: |
+          cd u-boot
+          mkdir -p output
+          make CROSS_COMPILE=aarch64-linux-gnu- O=output -j$(nproc) CONFIG_DEFAULT_DEVICE_TREE=qcom/sm6225-motorola-rhode
+
+      - name: Assemble Android boot.img
+        run: |
+          cd u-boot
+          gzip output/u-boot-dtb.bin -c > output/u-boot-dtb.bin.gz
+          ../mkbootimg/mkbootimg --header_version 3 --kernel output/u-boot-dtb.bin.gz --os_version "15.0.0" --os_patch_level "2025-10" -o output/u-boot.img
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: u-boot-rhode-${{ github.run_number }}
+          name: U-Boot Motorola Rhode - Build #${{ github.run_number }}
+          body: |
+            Automated U-Boot build for Motorola Rhode / Qualcomm SM6225.
+            - Branch: `sm6225`
+            - Target: `u-boot.img`
+          files: |
+            u-boot/output/u-boot.img
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
