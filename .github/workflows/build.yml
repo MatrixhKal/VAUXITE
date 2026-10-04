@@ -55,7 +55,7 @@ jobs:
       - name: Setup ReSukiSU
         working-directory: kernel
         run: |
-          curl -LSs "https://github.com/ReSukiSU/ReSukiSU/raw/refs/heads/main/kernel/setup.sh" | bash -s
+          curl -LSs "https://github.com/Baka-SU/BakaSU/raw/refs/heads/main/kernel/setup.sh" | bash -s
 
       - name: Generate defconfig
         working-directory: kernel
