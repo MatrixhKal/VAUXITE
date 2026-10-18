@@ -99,7 +99,6 @@ jobs:
           export ARCH=arm64
           export SUBARCH=arm64
 
-          export CC="ccache clang"
           export LLVM=1
           export LLVM_IAS=1
           export LD=ld.lld
@@ -110,7 +109,7 @@ jobs:
           export CCACHE_BASEDIR="$GITHUB_WORKSPACE/kernel"
 
           ccache -z
-          make -j"$(nproc --all)" O=out
+          make -j"$(nproc --all)" O=out CC="ccache clang"
           ccache -s
 
       - name: AnyKernel3
