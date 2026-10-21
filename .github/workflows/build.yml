@@ -83,12 +83,6 @@ jobs:
         working-directory: kernel
         run: curl -LSs "https://github.com/Baka-SU/BakaSU/raw/refs/heads/main/kernel/setup.sh" | bash -s
 
-      - name: Generate defconfig
-        working-directory: kernel
-        run: |
-          mkdir -p out
-          make O=out CC="ccache clang" vendor/ayanami_defconfig
-
       - name: Build Kernel
         working-directory: kernel
         run: |
@@ -105,7 +99,8 @@ jobs:
           export CCACHE_BASEDIR="$GITHUB_WORKSPACE/kernel"
 
           ccache -z
-          make -j"$(nproc --all)" O=out CC="ccache clang"
+          mkdir -p out
+          make -j"$(nproc --all)" O=out CC="ccache clang" vendor/ayanami_defconfig
           ccache -s
 
       - name: AnyKernel3
