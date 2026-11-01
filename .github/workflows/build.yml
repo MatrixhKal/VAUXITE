@@ -83,16 +83,6 @@ jobs:
         working-directory: kernel
         run: curl -LSs "https://github.com/Baka-SU/BakaSU/raw/refs/heads/main/kernel/setup.sh" | bash -s
 
-      - name: Generate defconfig
-        working-directory: kernel
-        run: |
-          mkdir -p out
-          sh scripts/kconfig/merge_config.sh -m -O out/ \
-            arch/arm64/configs/vendor/bengal-perf_defconfig \
-            arch/arm64/configs/vendor/ext_config/moto-bengal.config \
-            arch/arm64/configs/vendor/ext_config/rhode-default.config \
-            arch/arm64/configs/vendor/ayanami.config
-
       - name: Build Kernel
         working-directory: kernel
         run: |
