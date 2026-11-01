@@ -109,7 +109,6 @@ jobs:
           mkdir -p output
           git clone --depth=1 "$ANYKERNEL_REPO" AnyKernel3
           cp kernel/out/arch/arm64/boot/Image.gz AnyKernel3/Image.gz
-          cp kernel/out/arch/arm64/boot/*.img AnyKernel3/
           cd AnyKernel3
           zip -r9 "../output/${{ steps.vars.outputs.zip_name }}" . \
             -x ".git/*" ".github/*" "README.md" "*.zip"
