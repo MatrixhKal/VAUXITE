@@ -110,7 +110,7 @@ jobs:
 
           ccache -z
           mkdir -p out
-         # make -j"$(nproc --all)" O=out CC="ccache clang" rhode_defconfig
+          #make -j"$(nproc --all)" O=out CC="ccache clang" rhode_defconfig
           make -j"$(nproc --all)" O=out CC="ccache clang"
           ccache -s
 
